@@ -6,6 +6,9 @@
 // Test files
 #include "TestNetCDFhelper.cpp"
 #include "TestUtils.cpp"
+#include "TestUtilsComprehensive.cpp"
+#include "TestNetCDFhelperExtended.cpp"
+#include "TestDataTypes.cpp"
 
 //
 // In order to write a new test case, create a Test<File>.cpp and write the
@@ -20,5 +23,12 @@ int main()
     CppUnit::TextUi::TestRunner runner;
     runner.addTest(TestNetCDFhelper::suite());
     runner.addTest(TestUtils::suite());
+    runner.addTest(TestUtilsComprehensive::suite());
+    runner.addTest(TestNetCDFhelperExtended::suite());
+    runner.addTest(TestNNDataSetDimensionsExtended::suite());
+    runner.addTest(TestElapsedSeconds::suite());
+    runner.addTest(TestRandomUtils::suite());
+    runner.addTest(TestCWMetric::suite());
+    runner.addTest(TestConstants::suite());
     return runner.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
