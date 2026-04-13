@@ -4,6 +4,16 @@
 
 This document outlines the implementation plan for the next phase of development focusing on deep integration of standalone features in the Amazon DSSTNE (Deep Scalable Sparse Tensor Network Engine) library. The plan addresses identified gaps, technical debt, and opportunities for enhancement.
 
+### Key Decisions
+
+| Decision | Status | Notes |
+|----------|--------|-------|
+| **GPU Environment** | Virtual GPUs | Testing will use vGPU infrastructure |
+| **Priority Focus** | Core Inference & Training | Perfect these first, then extensions |
+| **Breaking Changes** | Acceptable | Original external connections likely defunct |
+| **Timeline** | 24 weeks | Approved |
+| **API Docs** | At discretion | Doxygen/Sphinx/Javadoc as needed |
+
 ---
 
 ## 1. Current State Analysis
@@ -35,11 +45,82 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
-## 2. Integration Phases
+## 2. Integration Phases (Reprioritized)
 
-### Phase 1: Core Infrastructure Unification (Weeks 1-4)
+> **PRIORITY**: Core inference & training functionality must be perfected first.
+> Parallel execution and multi-dimensional extensions come after core is stable.
 
-#### 2.1.1 Unified Configuration Management
+### Phase 1: Core Inference & Training Tests (Weeks 1-6) ⭐ HIGHEST PRIORITY
+
+#### 2.1.1 NNNetwork Core Test Suite
+
+**Objective:** Create comprehensive tests for core neural network inference and training.
+
+**Tasks:**
+- [ ] Test network loading from NetCDF files
+- [ ] Test forward propagation (PredictBatch)
+- [ ] Test training loop (Train method)
+- [ ] Test weight serialization/deserialization
+- [ ] Test checkpoint save/restore
+- [ ] Test all supported activation functions
+- [ ] Test all supported loss functions
+- [ ] Test all supported optimizers (SGD, Adam, etc.)
+
+**Files to Create:**
+- `tst/gputests/TestNNNetworkInference.cpp`
+- `tst/gputests/TestNNNetworkTraining.cpp`
+- `tst/gputests/TestNNNetworkCheckpoints.cpp`
+
+#### 2.1.2 NNLayer Core Test Suite
+
+**Objective:** Comprehensive testing of layer operations.
+
+**Tasks:**
+- [ ] Test layer initialization for all layer kinds (Input, Hidden, Output)
+- [ ] Test forward propagation per layer type
+- [ ] Test backpropagation per layer type
+- [ ] Test dropout behavior
+- [ ] Test batch normalization (if applicable)
+- [ ] Test sparse vs dense layer operations
+
+**Files to Create:**
+- `tst/gputests/TestNNLayerForward.cpp`
+- `tst/gputests/TestNNLayerBackward.cpp`
+
+#### 2.1.3 NNWeight Core Test Suite
+
+**Objective:** Test weight matrix operations thoroughly.
+
+**Tasks:**
+- [ ] Test all weight initialization schemes (Xavier, Gaussian, Uniform, SELU)
+- [ ] Test weight update algorithms
+- [ ] Test L1/L2 regularization
+- [ ] Test gradient computation correctness
+- [ ] Test weight sharing between layers
+
+**Files to Create:**
+- `tst/gputests/TestNNWeightInit.cpp`
+- `tst/gputests/TestNNWeightUpdate.cpp`
+
+#### 2.1.4 Virtual GPU Test Infrastructure
+
+**Objective:** Set up vGPU testing environment.
+
+**Tasks:**
+- [ ] Document vGPU setup requirements
+- [ ] Create test runner compatible with vGPU
+- [ ] Add vGPU detection and configuration
+- [ ] Create CI configuration for vGPU testing
+
+**Files to Create:**
+- `docs/VGPU_TESTING.md`
+- `tst/vgpu_setup.sh` (helper script)
+
+---
+
+### Phase 2: Core Infrastructure Unification (Weeks 7-10)
+
+#### 2.2.1 Unified Configuration Management
 
 **Objective:** Create a single, consistent configuration system across all modules.
 
@@ -54,7 +135,7 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 - `src/amazon/dsstne/engine/NNTypes.h`
 - New: `src/amazon/dsstne/config/DsstneConfig.h/cpp`
 
-#### 2.1.2 Centralized Error Handling
+#### 2.2.2 Centralized Error Handling
 
 **Objective:** Implement consistent error handling and logging across modules.
 
@@ -70,76 +151,11 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
-### Phase 2: Runtime Context Enhancement (Weeks 5-8)
+### Phase 3: Gradient & Weight Optimization (Weeks 11-14)
 
-#### 2.2.1 Multi-Dimensional Output Support
+> **Note:** These fixes are critical for training correctness.
 
-**Objective:** Fix the limitation where topK only supports 1-D outputs.
-
-**Tasks:**
-- [ ] Extend `DsstneContext` to support N-D output layers
-- [ ] Modify `CalculateTopK` to handle multi-dimensional tensors
-- [ ] Update Python and Java bindings accordingly
-- [ ] Add comprehensive test cases for N-D scenarios
-
-**Files to Modify:**
-- `src/amazon/dsstne/runtime/DsstneContext.cpp`
-- `src/amazon/dsstne/engine/NNNetwork.cpp`
-- `python/NNNetworkFunctions.h`
-- `java/src/main/native/com_amazon_dsstne_Dsstne.cpp`
-
-#### 2.2.2 Data-Parallel Weight Distribution
-
-**Objective:** Implement proper data-parallel detection and weight distribution.
-
-**Tasks:**
-- [ ] Create `ParallelismDetector` utility class
-- [ ] Implement automatic data-parallel detection in `NNWeight`
-- [ ] Optimize weight synchronization for data-parallel mode
-- [ ] Add benchmarks comparing model-parallel vs data-parallel
-
-**Files to Modify:**
-- `src/amazon/dsstne/engine/NNWeight.cpp`
-- `src/amazon/dsstne/engine/NNNetwork.cpp`
-- New: `src/amazon/dsstne/engine/ParallelismDetector.h/cpp`
-
----
-
-### Phase 3: KNN Module Integration (Weeks 9-12)
-
-#### 2.3.1 Unified Data Pipeline
-
-**Objective:** Integrate KNN module with main neural network pipeline.
-
-**Tasks:**
-- [ ] Create `DataPipeline` abstraction for shared data handling
-- [ ] Implement streaming support between NN inference and KNN
-- [ ] Add support for embedding extraction → KNN lookup workflow
-- [ ] Optimize memory usage for large-scale similarity search
-
-**Files to Create:**
-- `src/amazon/dsstne/pipeline/DataPipeline.h/cpp`
-- `src/amazon/dsstne/pipeline/EmbeddingKnnPipeline.h/cpp`
-
-#### 2.3.2 KNN API Improvements
-
-**Objective:** Make KNN module accessible from Python and Java.
-
-**Tasks:**
-- [ ] Create Python bindings for KNN functions
-- [ ] Create Java bindings for KNN functions
-- [ ] Add documentation and examples
-- [ ] Implement batch KNN queries
-
-**Files to Modify:**
-- `python/dsstnemodule.cc`
-- `java/src/main/native_knn/com_amazon_dsstne_knn_KNearestNeighborsCuda.cpp`
-
----
-
-### Phase 4: Bias Gradient and Derivative Optimization (Weeks 13-16)
-
-#### 2.4.1 Centered Derivative Implementation
+#### 2.3.1 Centered Derivative Implementation
 
 **Objective:** Replace non-centered derivative formula with centered version.
 
@@ -153,7 +169,7 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 - `src/amazon/dsstne/engine/kernels.cu`
 - `src/amazon/dsstne/engine/kDelta.cu`
 
-#### 2.4.2 Explicit Bias Gradient
+#### 2.3.2 Explicit Bias Gradient
 
 **Objective:** Replace bias gradient hack with explicit implementation.
 
@@ -169,24 +185,9 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
-### Phase 5: Recommendation Generation Optimization (Weeks 17-20)
+### Phase 4: Streaming & Efficiency (Weeks 15-18)
 
-#### 2.5.1 Multi-GPU Node Filter Support
-
-**Objective:** Add Node Filter support for multi-GPU configurations.
-
-**Tasks:**
-- [ ] Extend filter infrastructure for distributed execution
-- [ ] Implement filter synchronization across GPUs
-- [ ] Add filter result aggregation
-- [ ] Test with various filter types
-
-**Files to Modify:**
-- `src/amazon/dsstne/utils/Filters.cpp`
-- `src/amazon/dsstne/utils/FilterHelper.cpp`
-- `src/amazon/dsstne/utils/NNRecsGenerator.cpp`
-
-#### 2.5.2 Streaming Inference Pipeline
+#### 2.4.1 Streaming Inference Pipeline
 
 **Objective:** Eliminate NetCDF regeneration inefficiency in prediction.
 
@@ -202,9 +203,11 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
-### Phase 6: Language Binding Unification (Weeks 21-24)
+### Phase 5: Language Bindings (Weeks 19-22)
 
-#### 2.6.1 Python Binding Modernization
+> **Note:** Breaking changes are acceptable - original external connections likely defunct.
+
+#### 2.5.1 Python Binding Modernization
 
 **Objective:** Modernize Python bindings with NumPy 2.x support.
 
@@ -219,7 +222,7 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 - `python/setup.py`
 - New: `python/dsstne/__init__.py` (Python wrapper)
 
-#### 2.6.2 Java API Enhancement
+#### 2.5.2 Java API Enhancement
 
 **Objective:** Provide a more idiomatic Java API.
 
@@ -235,28 +238,112 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
+### Phase 6: Parallel & Multi-Dimensional Extensions (Weeks 23-24)
+
+> **Note:** Only after core inference & training is perfected.
+
+#### 2.6.1 Multi-Dimensional Output Support
+
+**Objective:** Fix the limitation where topK only supports 1-D outputs.
+
+**Tasks:**
+- [ ] Extend `DsstneContext` to support N-D output layers
+- [ ] Modify `CalculateTopK` to handle multi-dimensional tensors
+- [ ] Update Python and Java bindings accordingly
+- [ ] Add comprehensive test cases for N-D scenarios
+
+**Files to Modify:**
+- `src/amazon/dsstne/runtime/DsstneContext.cpp`
+- `src/amazon/dsstne/engine/NNNetwork.cpp`
+- `python/NNNetworkFunctions.h`
+- `java/src/main/native/com_amazon_dsstne_Dsstne.cpp`
+
+#### 2.6.2 Data-Parallel Weight Distribution
+
+**Objective:** Implement proper data-parallel detection and weight distribution.
+
+**Tasks:**
+- [ ] Create `ParallelismDetector` utility class
+- [ ] Implement automatic data-parallel detection in `NNWeight`
+- [ ] Optimize weight synchronization for data-parallel mode
+- [ ] Add benchmarks comparing model-parallel vs data-parallel
+
+**Files to Modify:**
+- `src/amazon/dsstne/engine/NNWeight.cpp`
+- `src/amazon/dsstne/engine/NNNetwork.cpp`
+- New: `src/amazon/dsstne/engine/ParallelismDetector.h/cpp`
+
+#### 2.6.3 Multi-GPU Node Filter Support
+
+**Objective:** Add Node Filter support for multi-GPU configurations.
+
+**Tasks:**
+- [ ] Extend filter infrastructure for distributed execution
+- [ ] Implement filter synchronization across GPUs
+- [ ] Add filter result aggregation
+- [ ] Test with various filter types
+
+**Files to Modify:**
+- `src/amazon/dsstne/utils/Filters.cpp`
+- `src/amazon/dsstne/utils/FilterHelper.cpp`
+- `src/amazon/dsstne/utils/NNRecsGenerator.cpp`
+
+#### 2.6.4 KNN Module Integration
+
+**Objective:** Integrate KNN module with main neural network pipeline.
+
+**Tasks:**
+- [ ] Create `DataPipeline` abstraction for shared data handling
+- [ ] Implement streaming support between NN inference and KNN
+- [ ] Add support for embedding extraction → KNN lookup workflow
+- [ ] Create Python/Java bindings for KNN functions
+
+**Files to Create/Modify:**
+- `src/amazon/dsstne/pipeline/DataPipeline.h/cpp`
+- `src/amazon/dsstne/pipeline/EmbeddingKnnPipeline.h/cpp`
+- `python/dsstnemodule.cc`
+- `java/src/main/native_knn/com_amazon_dsstne_knn_KNearestNeighborsCuda.cpp`
+
+---
+
 ## 3. Testing Strategy
 
-### 3.1 Unit Testing Expansion
+### 3.1 Virtual GPU Testing Environment
+
+**Environment Setup:**
+- vGPU infrastructure for CI/CD
+- Compatible with NVIDIA GRID or similar virtualization
+- Memory and compute resource isolation
+
+**Configuration:**
+```bash
+# vGPU detection
+nvidia-smi -L  # List available virtual GPUs
+# Test with specific vGPU
+CUDA_VISIBLE_DEVICES=0 ./run_tests.sh
+```
+
+### 3.2 Unit Testing Expansion (Prioritized)
 
 | Module | Current Tests | Target Tests | Priority |
 |--------|---------------|--------------|----------|
-| Utils | 7 | 50+ | High |
-| NetCDFhelper | 6 | 40+ | High |
-| NNNetwork | 0 | 30+ | Critical |
-| NNLayer | 0 | 25+ | Critical |
-| NNWeight | 0 | 20+ | Critical |
-| KNN | 0 | 15+ | Medium |
+| **NNNetwork (Inference)** | 0 | 30+ | ⭐ CRITICAL |
+| **NNNetwork (Training)** | 0 | 30+ | ⭐ CRITICAL |
+| **NNLayer** | 0 | 25+ | ⭐ CRITICAL |
+| **NNWeight** | 0 | 20+ | ⭐ CRITICAL |
+| Utils | 85+ | 85+ | ✅ Done |
+| NetCDFhelper | 36+ | 40+ | High |
+| KNN | 0 | 15+ | Low (Phase 6) |
 | Bindings | 11 (Java) | 30+ | Medium |
 
-### 3.2 Integration Testing
+### 3.3 Integration Testing
 
 - [ ] Create end-to-end test pipeline
 - [ ] Add benchmark regression tests
 - [ ] Implement GPU-based test automation
 - [ ] Create multi-GPU test environment
 
-### 3.3 Performance Benchmarks
+### 3.4 Performance Benchmarks
 
 - [ ] Establish baseline benchmarks
 - [ ] Create benchmark automation
@@ -311,16 +398,16 @@ Based on codebase analysis, the following TODO/FIXME items need attention:
 
 ---
 
-## 7. Timeline Summary
+## 7. Timeline Summary (Reprioritized)
 
-| Phase | Weeks | Focus Area |
-|-------|-------|------------|
-| 1 | 1-4 | Core Infrastructure Unification |
-| 2 | 5-8 | Runtime Context Enhancement |
-| 3 | 9-12 | KNN Module Integration |
-| 4 | 13-16 | Gradient Optimization |
-| 5 | 17-20 | Recommendation Generation |
-| 6 | 21-24 | Language Binding Unification |
+| Phase | Weeks | Focus Area | Priority |
+|-------|-------|------------|----------|
+| 1 | 1-6 | **Core Inference & Training Tests** | ⭐ HIGHEST |
+| 2 | 7-10 | Core Infrastructure Unification | High |
+| 3 | 11-14 | Gradient & Weight Optimization | High |
+| 4 | 15-18 | Streaming & Efficiency | Medium |
+| 5 | 19-22 | Language Bindings | Medium |
+| 6 | 23-24 | Parallel & Multi-Dim Extensions | Low (after core) |
 
 **Total Duration:** 24 weeks (6 months)
 
@@ -369,7 +456,7 @@ Modified Files:
 
 ### B. Dependencies
 
-- CUDA 9.1+ (recommend 11.x for newer GPUs)
+- CUDA 9.1+ (recommend 11.x for newer GPUs/vGPU)
 - cuDNN 7.0+
 - OpenMPI 2.0+
 - NetCDF 4.x
@@ -378,8 +465,35 @@ Modified Files:
 - Python 3.7+ with NumPy
 - Java 8+
 
+### C. Breaking Changes Policy
+
+> **Breaking changes are acceptable** for this project.
+> 
+> Original external connections to the repository are likely defunct.
+> The focus is on creating a clean, well-tested codebase rather than
+> maintaining backward compatibility with unmaintained integrations.
+
+**Acceptable Breaking Changes:**
+- API signature changes in Python/Java bindings
+- Configuration file format updates
+- CLI argument changes
+- Removed deprecated functionality
+- NetCDF format version updates (with migration tools)
+
+**Mitigation:**
+- Document all breaking changes in CHANGELOG.md
+- Provide migration guides where feasible
+- Version the API explicitly
+
 ---
 
-*Document Version: 1.0*
+*Document Version: 1.1*
 *Last Updated: April 2026*
 *Authors: GitHub Copilot Agent*
+
+### Revision History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | April 2026 | Initial plan |
+| 1.1 | April 2026 | Reprioritized phases: core inference/training first, added vGPU testing, breaking changes acceptable |
