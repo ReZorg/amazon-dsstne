@@ -16,7 +16,7 @@ Category: Parameter blocks
     PredictionParameters
 
 Category: Data source declaration
-    Data (current parser expects a single String path)
+    Data (path list; most workflows provide a single data file)
 
 TrainingParameters - only used if Command is Train
 PredictionParameters - only used if Command is Predict
@@ -25,7 +25,12 @@ PredictionParameters - only used if Command is Predict
     "Network" : <String>                    # NetCDF or JSON file path (default "config.json")
     "Command" : <String>                    # (required) Command to execute "Train", "Predict", or "Validate"
     "RandomSeed" : <Integer>                # Initializes RNG for reproducible runs (default -1, sets from time of day)
-    "Data" : <String>                       # (required) Data source file path
+    "Data" : [                              # (required) List of data source files
+        <String>
+        .
+        .
+        .
+    ],
     "TrainingParameters" : {
         "Epochs" : <Integer>                # (required) Number of training epochs
         "MiniBatch" : <Integer>             # Mini-batch size (default 500, use 0 for entire dataset)
