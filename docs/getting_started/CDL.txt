@@ -8,7 +8,7 @@ Category: Command
     Validate
 
 Category: TrainingParameters.Optimizer
-    Accepted in current CDL JSON parser: SGD, Nesterov
+    Currently supported in CDL JSON parser: SGD, Nesterov
     Known training modes in engine: SGD, Momentum, AdaGrad, Nesterov, RMSProp, AdaDelta, Adam
 
 Category: Parameter blocks
