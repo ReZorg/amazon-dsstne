@@ -1,0 +1,11 @@
+{
+  "category": "Layer Type",
+  "allowedValues": ["FullyConnected", "Convolutional", "Pooling"],
+  "template": {
+    "Layers": [
+      { "Kind": "Hidden", "Type": "FullyConnected", "N": 128 },
+      { "Kind": "Hidden", "Type": "Convolutional", "N": 64, "Kernel": [3, 3] },
+      { "Kind": "Pooling", "Function": "Max", "Kernel": [2, 2] }
+    ]
+  }
+}

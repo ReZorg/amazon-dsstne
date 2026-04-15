@@ -1,0 +1,7 @@
+{
+  "category": "Network Kind",
+  "allowedValues": ["FeedForward", "AutoEncoder"],
+  "template": {
+    "Kind": "FeedForward"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "category": "WeightInit.Scheme",
+  "allowedValues": ["Xavier", "CaffeXavier", "Gaussian", "Uniform", "UnitBall", "Constant", "SELU"],
+  "template": {
+    "Layers": [
+      {
+        "Kind": "Hidden",
+        "N": 256,
+        "WeightInit": {
+          "Scheme": "Xavier",
+          "Scale": 1.0,
+          "Bias": 0.0
+        }
+      }
+    ]
+  }
+}

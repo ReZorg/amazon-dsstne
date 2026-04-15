@@ -1,0 +1,9 @@
+{
+  "category": "Input text dataset type (generateNetCDF -t)",
+  "allowedValues": ["indicator", "analog"],
+  "template": {
+    "generateNetCDF": {
+      "type": "indicator"
+    }
+  }
+}

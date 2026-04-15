@@ -1,0 +1,7 @@
+{
+  "category": "ErrorFunction",
+  "allowedValues": ["L1", "L2", "CrossEntropy", "ScaledMarginalCrossEntropy", "DataScaledMarginalCrossEntropy", "Hinge", "L2Hinge"],
+  "template": {
+    "ErrorFunction": "CrossEntropy"
+  }
+}

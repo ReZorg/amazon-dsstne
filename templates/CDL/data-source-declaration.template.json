@@ -1,0 +1,10 @@
+{
+  "category": "Data source declaration",
+  "allowedValues": ["Data"],
+  "template": {
+    "Data": [
+      "input_dataset.nc",
+      "output_dataset.nc"
+    ]
+  }
+}
