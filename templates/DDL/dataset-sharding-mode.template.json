@@ -1,0 +1,7 @@
+{
+  "category": "Dataset sharding mode",
+  "allowedValues": ["None", "Model", "Data"],
+  "template": {
+    "shardingMode": "None"
+  }
+}

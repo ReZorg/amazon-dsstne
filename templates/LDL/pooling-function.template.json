@@ -1,0 +1,15 @@
+{
+  "category": "Pooling function",
+  "allowedValues": ["None", "Max", "Average", "LocalResponseNormalization", "Maxout", "DotProduct", "Cosine", "Stochastic", "LocalContrastNormalization", "GlobalTemporal"],
+  "template": {
+    "Layers": [
+      {
+        "Kind": "Pooling",
+        "Source": "Hidden1",
+        "Function": "Max",
+        "Kernel": [2, 2],
+        "KernelStride": [2, 2]
+      }
+    ]
+  }
+}

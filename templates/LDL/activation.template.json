@@ -1,0 +1,24 @@
+{
+  "category": "Activation",
+  "allowedValues": [
+    "Sigmoid",
+    "Tanh",
+    "RectifiedLinear",
+    "Linear",
+    "ParametricRectifiedLinear",
+    "SoftPlus",
+    "SoftSign",
+    "SoftMax",
+    "RELUMax",
+    "LinearMax",
+    "ExponentialLinear",
+    "LeakyRectifiedLinear",
+    "ScaledExponentialLinear"
+  ],
+  "template": {
+    "Layers": [
+      { "Kind": "Hidden", "Activation": "RectifiedLinear", "N": 256 },
+      { "Kind": "Output", "Activation": "Sigmoid", "N": "auto" }
+    ]
+  }
+}

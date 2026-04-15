@@ -1,0 +1,12 @@
+{
+  "category": "Layer Kind",
+  "allowedValues": ["Input", "Hidden", "Output", "Target"],
+  "template": {
+    "Layers": [
+      { "Kind": "Input" },
+      { "Kind": "Hidden" },
+      { "Kind": "Output" },
+      { "Kind": "Target" }
+    ]
+  }
+}

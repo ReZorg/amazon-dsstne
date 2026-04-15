@@ -1,0 +1,7 @@
+{
+  "category": "Dataset attributes (attributesN bitmask flags)",
+  "allowedValues": ["Sparse", "Boolean", "Compressed", "Recurrent", "Mutable", "SparseIgnoreZero", "Indexed", "Weighted"],
+  "template": {
+    "attributes": ["Sparse", "Boolean"]
+  }
+}

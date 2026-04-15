@@ -1,0 +1,7 @@
+{
+  "category": "Command",
+  "allowedValues": ["Train", "Predict", "Validate"],
+  "template": {
+    "Command": "Train"
+  }
+}

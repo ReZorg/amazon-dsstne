@@ -1,0 +1,7 @@
+{
+  "category": "NetCDF dataset data type (dataTypeN)",
+  "allowedValues": ["UInt", "Int", "LLInt", "ULLInt", "Float", "Double", "RGB8", "RGB16", "UChar", "Char"],
+  "template": {
+    "dataType": "Float"
+  }
+}
