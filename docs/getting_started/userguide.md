@@ -100,8 +100,9 @@ data:
 ```
 
 # Neural Network Layer Definition Language
-The definitions for the Neural Network fed into DSSTNE are represented in a JSON format. Comprehensive category/type catalogs are available in [CDL.txt](CDL.txt), [DDL.txt](DDL.txt), and [LDL.txt](LDL.txt).
-A sample LDL is given below.
+The definitions for the Neural Network fed into DSSTNE are represented in a JSON format.
+Comprehensive category/type catalogs are available in [CDL.txt](CDL.txt), [DDL.txt](DDL.txt), and [LDL.txt](LDL.txt).
+A sample LDL definition is shown below to illustrate the network definition format.
 ```js
 {
     "Version" : 0.8,
