@@ -9,7 +9,7 @@ All 7 training modes are now parseable via the JSON CDL config (`"optimizer"` ke
 | CDL string    | DSSTNE `TrainingMode` | `torch.optim` equivalent |
 |---------------|------------------------|--------------------------|
 | `"sgd"`       | `SGD`                  | `torch.optim.SGD`        |
-| `"momentum"`  | `Momentum`             | `torch.optim.SGD(momentum=…)` |
+| `"momentum"`  | `Momentum`             | `torch.optim.SGD(momentum=…)` (DSSTNE treats this as a distinct mode, while PyTorch uses it as a parameter to SGD) |
 | `"adagrad"`   | `AdaGrad`              | `torch.optim.Adagrad`    |
 | `"nesterov"`  | `Nesterov`             | `torch.optim.SGD(nesterov=True)` |
 | `"rmsprop"`   | `RMSProp`              | `torch.optim.RMSprop`    |

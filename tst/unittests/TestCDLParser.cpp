@@ -5,8 +5,8 @@
 #include <string>
 #include <map>
 
-// Mirror the enums from NNTypes.h (without GPU dependencies)
-// These values must match NNTypes.h exactly.
+// Mirror the enums from NNTypes.h (src/amazon/dsstne/engine/NNTypes.h)
+// without GPU dependencies. Values must stay in sync with NNTypes.h.
 
 enum TrainingMode
 {
