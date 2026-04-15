@@ -67,7 +67,6 @@ Category: Pooling function
     Stochastic
     LocalContrastNormalization
     GlobalTemporal
-
 {
     "Version"           : <String>                      # Indicates version (by default uses latest)
     "Name"              : <String>                      # Optional name for network
