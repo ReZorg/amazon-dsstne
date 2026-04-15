@@ -236,7 +236,7 @@ void kCalculateSoftMaxActivation(NNFloat* pData, uint32_t batch, uint32_t stride
 }
 
 // SoftPlus: f(x) = log(1 + exp(x))
-// Note: using log1p(exp(x)) for numerical stability
+// Uses log1p for numerical stability. For large x: f(x) ≈ x (no overflow since log1p(exp(x)) clips).
 __global__ void kCalculateSoftPlusActivation_kernel(NNFloat* pData, uint64_t size)
 {
     uint64_t pos = blockIdx.x * blockDim.x + threadIdx.x;

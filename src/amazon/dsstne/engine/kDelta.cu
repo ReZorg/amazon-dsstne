@@ -464,12 +464,16 @@ kCalculateSoftMaxOutputDelta_kernel(uint32_t position, uint32_t batch, uint32_t 
 
 
 // New activation output delta kernel templates (non-indexed and indexed)
+// NOTE: pUnit holds post-activation values a = f(x). Derivatives are expressed
+//       in terms of a using the mathematical identities documented per kernel.
 
 template<typename T>
 __global__ void LAUNCH_BOUNDS()
 kCalculateSoftPlusOutputDelta_kernel(uint32_t position, uint32_t batch, uint32_t stride,
     NNFloat* pUnit, NNFloat* pDelta, T* pData, NNFloat* pDataWeight)
 {
+    // SoftPlus: a = log(1+exp(x)); f'(x) = sigmoid(x) = 1-exp(-a)
+    // Identity: exp(-a) = 1/(1+exp(x)) = 1-sigmoid(x)
     uint64_t pos = (blockIdx.y * blockDim.x) + threadIdx.x;
     if (pos < stride) {
         uint64_t uOffset = blockIdx.x * stride;
@@ -487,6 +491,8 @@ __global__ void LAUNCH_BOUNDS()
 kCalculateSoftSignOutputDelta_kernel(uint32_t position, uint32_t batch, uint32_t stride,
     NNFloat* pUnit, NNFloat* pDelta, T* pData, NNFloat* pDataWeight)
 {
+    // SoftSign: a = x/(1+|x|); f'(x) = 1/(1+|x|)^2 = (1-|a|)^2
+    // Identity: 1/(1+|x|) = 1-|a| since |a| = |x|/(1+|x|)
     uint64_t pos = (blockIdx.y * blockDim.x) + threadIdx.x;
     if (pos < stride) {
         uint64_t uOffset = blockIdx.x * stride;
@@ -10005,7 +10011,10 @@ __global__ void
 LAUNCH_BOUNDS()
 kCalculateSoftPlusHadamardProduct_kernel(uint64_t size, NNFloat* pUnit, NNFloat* pDelta)
 {
-    // f'(x) = sigmoid(x) = 1 - exp(-a) where a = softplus(x) = log(1+exp(x))
+    // SoftPlus: f(x) = log(1+exp(x)), f'(x) = sigmoid(x) = 1/(1+exp(-x))
+    // pUnit stores the post-activation output a = f(x).
+    // Identity: sigmoid(x) = 1 - exp(-f(x)) = 1 - exp(-a)
+    // Proof: exp(-a) = exp(-log(1+exp(x))) = 1/(1+exp(x)) = 1 - sigmoid(x)
     uint64_t pos                = blockIdx.x * blockDim.x + threadIdx.x;
     if (pos < size)
         pDelta[pos]            *= ((NNFloat)1.0 - expf(-pUnit[pos]));
@@ -10015,7 +10024,10 @@ __global__ void
 LAUNCH_BOUNDS()
 kCalculateSoftSignHadamardProduct_kernel(uint64_t size, NNFloat* pUnit, NNFloat* pDelta)
 {
-    // f'(x) = 1/(1+|x|)^2 = (1-|a|)^2 where a = softsign(x)
+    // SoftSign: f(x) = x/(1+|x|), f'(x) = 1/(1+|x|)^2
+    // pUnit stores the post-activation output a = f(x).
+    // Identity: 1/(1+|x|) = 1 - |a|  (since a = x/(1+|x|) => |a| = |x|/(1+|x|) => 1-|a| = 1/(1+|x|))
+    // Therefore f'(x) = (1-|a|)^2
     uint64_t pos                = blockIdx.x * blockDim.x + threadIdx.x;
     if (pos < size)
     {
