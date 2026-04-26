@@ -206,9 +206,10 @@ public:
     }
     
     void TestIsFileWithNonExisting() {
-        // Note: isFile() does not check stat()'s return code, so the result for
-        // a non-existing path is implementation-defined (uninitialized buf.st_mode).
-        // We simply document that calling it does not crash.
+        // Known implementation defect: isFile() does not check the return code of stat(),
+        // so its result on a non-existing path depends on uninitialised stack memory.
+        // This test documents the defect by verifying the call does not crash, without
+        // asserting a specific return value.
         isFile(tempDir + "/nonexistent_file.txt");
     }
 
@@ -286,7 +287,9 @@ public:
         CPPUNIT_ASSERT(cmdOptionExists(argv, argv + argc, "-f"));
         CPPUNIT_ASSERT(cmdOptionExists(argv, argv + argc, "-v"));
         CPPUNIT_ASSERT(!cmdOptionExists(argv, argv + argc, "-x"));
-        // cmdOptionExists finds any element in argv, including values (not just flags)
+        // cmdOptionExists uses std::find on argv, so it matches any element including
+        // value arguments, not just flags.  Verify it finds "file.txt" even though it
+        // is a value, not a flag.
         CPPUNIT_ASSERT(cmdOptionExists(argv, argv + argc, "file.txt"));
     }
     

@@ -162,8 +162,9 @@ public:
     }
     
     void TestLoadIndexWithEmptyIndex() {
-        // "label\t" - tab present but no index value after the tab.
-        // split("label\t", '\t') returns ["label"] (size 1), which fails the size==2 check.
+        // "label\t\n": getline yields "label\t", which split() tokenises as ["label"]
+        // (size 1).  loadIndex() requires exactly two tokens per line (label + index),
+        // so a single-token line is treated as invalid input.
         stringstream inputStream("label\t\n");
         unordered_map<string, unsigned int> labelsToIndices;
         stringstream outputStream;

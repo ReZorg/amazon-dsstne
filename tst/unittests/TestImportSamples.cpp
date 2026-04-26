@@ -42,6 +42,13 @@ private:
 
     void removeTempDir() {
         if (!tempDir.empty()) {
+            // tempDir comes from mkdtemp() which produces only alphanumeric/underscore
+            // paths, so there are no shell metacharacters.  Verify this before use.
+            for (char c : tempDir) {
+                if (!isalnum(c) && c != '/' && c != '_' && c != '-' && c != '.') {
+                    return; // unexpected character - skip removal
+                }
+            }
             system(("rm -rf " + tempDir).c_str());
         }
     }
