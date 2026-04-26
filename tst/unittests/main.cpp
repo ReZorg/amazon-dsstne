@@ -6,6 +6,9 @@
 // Test files
 #include "TestNetCDFhelper.cpp"
 #include "TestUtils.cpp"
+#include "TestUtilsComprehensive.cpp"
+#include "TestNetCDFhelperExtended.cpp"
+#include "TestDataTypes.cpp"
 #include "TestCDLParser.cpp"
 
 //
@@ -21,6 +24,14 @@ int main()
     CppUnit::TextUi::TestRunner runner;
     runner.addTest(TestNetCDFhelper::suite());
     runner.addTest(TestUtils::suite());
+    runner.addTest(TestUtilsComprehensive::suite());
+    runner.addTest(TestNetCDFhelperExtended::suite());
+    // Note: TestNNDataSetDimensionsExtended tests are in tst/amazon/dsstne/engine/
+    // and require GPU dependencies. They run as part of the GPU test suite.
+    runner.addTest(TestElapsedSeconds::suite());
+    runner.addTest(TestRandomUtils::suite());
+    runner.addTest(TestCWMetric::suite());
+    runner.addTest(TestConstants::suite());
     runner.addTest(TestCDLParser::suite());
     return runner.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
