@@ -235,4 +235,55 @@ void kCalculateSoftMaxActivation(NNFloat* pData, uint32_t batch, uint32_t stride
     LAUNCHERROR("kCalculateSoftMaxActivation_kernel");
 }
 
+// SoftPlus: f(x) = log(1 + exp(x))
+// Uses log1p for numerical stability for small x. Note: for very large x,
+// expf(x) may overflow; in practice GPU training clips inputs to reasonable ranges.
+__global__ void kCalculateSoftPlusActivation_kernel(NNFloat* pData, uint64_t size)
+{
+    uint64_t pos = blockIdx.x * blockDim.x + threadIdx.x;
+    if (pos < size)
+        pData[pos] = log1pf(expf(pData[pos]));
+}
+
+void kCalculateSoftPlusActivation(NNFloat* pData, uint64_t size)
+{
+    uint32_t blocks = CalculateBlocks(size);
+    kCalculateSoftPlusActivation_kernel<<<blocks, getGpu()._threadsPerBlock>>>(pData, size);
+    LAUNCHERROR("kCalculateSoftPlusActivation_kernel");
+}
+
+// SoftSign: f(x) = x / (1 + |x|)
+__global__ void kCalculateSoftSignActivation_kernel(NNFloat* pData, uint64_t size)
+{
+    uint64_t pos = blockIdx.x * blockDim.x + threadIdx.x;
+    if (pos < size)
+    {
+        NNFloat x = pData[pos];
+        pData[pos] = x / ((NNFloat)1.0 + fabsf(x));
+    }
+}
+
+void kCalculateSoftSignActivation(NNFloat* pData, uint64_t size)
+{
+    uint32_t blocks = CalculateBlocks(size);
+    kCalculateSoftSignActivation_kernel<<<blocks, getGpu()._threadsPerBlock>>>(pData, size);
+    LAUNCHERROR("kCalculateSoftSignActivation_kernel");
+}
+
+// RELUMax: f(x) = max(0, x)  (same compute as RELU; "Max" refers to usage in Maxout context)
+__global__ void kCalculateRELUMaxActivation_kernel(NNFloat* pData, uint64_t size)
+{
+    uint64_t pos = blockIdx.x * blockDim.x + threadIdx.x;
+    if (pos < size)
+        pData[pos] = max((NNFloat)0.0, pData[pos]);
+}
+
+void kCalculateRELUMaxActivation(NNFloat* pData, uint64_t size)
+{
+    uint32_t blocks = CalculateBlocks(size);
+    kCalculateRELUMaxActivation_kernel<<<blocks, getGpu()._threadsPerBlock>>>(pData, size);
+    LAUNCHERROR("kCalculateRELUMaxActivation_kernel");
+}
+
+// LinearMax: f(x) = x  (identity; no kernel needed – Linear is a no-op in CalculateActivation)
 

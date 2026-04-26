@@ -1,0 +1,7 @@
+{
+  "category": "NetCDF dataset kind (kindN)",
+  "allowedValues": ["Numeric", "Image", "Audio"],
+  "template": {
+    "kind": "Numeric"
+  }
+}

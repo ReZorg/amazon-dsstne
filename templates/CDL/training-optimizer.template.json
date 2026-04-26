@@ -1,0 +1,9 @@
+{
+  "category": "TrainingParameters.Optimizer",
+  "allowedValues": ["SGD", "Momentum", "AdaGrad", "Nesterov", "RMSProp", "AdaDelta", "Adam"],
+  "template": {
+    "TrainingParameters": {
+      "Optimizer": "SGD"
+    }
+  }
+}

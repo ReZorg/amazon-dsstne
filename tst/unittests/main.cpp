@@ -9,6 +9,7 @@
 #include "TestUtilsComprehensive.cpp"
 #include "TestNetCDFhelperExtended.cpp"
 #include "TestDataTypes.cpp"
+#include "TestCDLParser.cpp"
 
 //
 // In order to write a new test case, create a Test<File>.cpp and write the
@@ -31,5 +32,6 @@ int main()
     runner.addTest(TestRandomUtils::suite());
     runner.addTest(TestCWMetric::suite());
     runner.addTest(TestConstants::suite());
+    runner.addTest(TestCDLParser::suite());
     return runner.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

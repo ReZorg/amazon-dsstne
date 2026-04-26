@@ -1,5 +1,32 @@
 Command Definition Language (Rev 0.1):
 
+Generalized CDL catalog (categories and known types):
+
+Category: Command
+    Train
+    Predict
+    Validate
+
+Category: TrainingParameters.Optimizer
+    SGD
+    Momentum
+    AdaGrad
+    Nesterov
+    RMSProp
+    AdaDelta
+    Adam
+
+Category: Parameter blocks
+    TrainingParameters
+    PredictionParameters
+
+Category: Data source declaration
+    Data
+
+Implementation Notes:
+    All 7 optimizer modes are now available via the CDL JSON parser for
+    TrainingParameters.Optimizer: SGD, Momentum, AdaGrad, Nesterov, RMSProp, AdaDelta, Adam.
+
 TrainingParameters - only used if Command is Train
 PredictionParameters - only used if Command is Predict
 
@@ -21,7 +48,7 @@ PredictionParameters - only used if Command is Predict
         "mu" : <float>                      # Momentum update parameter (default 0.9)
         "AlphaInterval" : <float>           # Interval between learning rate updates (default 0: constant)
         "AlphaMultiplier" : <float>         # Learning rate multiplier per Interval (default: 0.5, or if lr is constant: 1.0)
-        "Optimizer" : <String>              # Optimization method, either "SGD", "Momentum", "RMSPROP", or "Nesterov" (default "SGD")
+        "Optimizer" : <String>              # Optimization method: "SGD", "Momentum", "AdaGrad", "Nesterov", "RMSProp", "AdaDelta", "Adam" (default "SGD")
         "CheckpointName" : <String>         # Location to write checkpoint information, appended with epoch number and ".nc" (default "check")
         "CheckpointInterval" : <Integer>    # Number of epochs between writing checkpoint data (default 1)
         "ShuffleIndices" : <Boolean>        # Shuffle training examples once per epoch? (default false)

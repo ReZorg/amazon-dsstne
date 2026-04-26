@@ -1,0 +1,12 @@
+{
+  "category": "Layer Attributes",
+  "allowedValues": ["None", "Sparse", "Denoising", "BatchNormalization"],
+  "template": {
+    "Layers": [
+      { "Kind": "Input", "Sparse": false },
+      { "Kind": "Input", "Sparse": true },
+      { "Kind": "Input", "Denoising": true },
+      { "Kind": "Hidden", "BatchNormalization": true }
+    ]
+  }
+}
