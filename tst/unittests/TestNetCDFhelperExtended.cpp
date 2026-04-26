@@ -15,6 +15,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <fstream>
+#include <climits>
 #include <cstdlib>
 #include <sys/stat.h>
 
@@ -161,15 +162,15 @@ public:
     }
     
     void TestLoadIndexWithEmptyIndex() {
-        // Tab present but no index value
+        // "label\t" - tab present but no index value after the tab.
+        // split("label\t", '\t') returns ["label"] (size 1), which fails the size==2 check.
         stringstream inputStream("label\t\n");
         unordered_map<string, unsigned int> labelsToIndices;
         stringstream outputStream;
         
-        // atoi("") returns 0, so this should work
         bool result = loadIndex(labelsToIndices, inputStream, outputStream);
-        CPPUNIT_ASSERT(result);
-        CPPUNIT_ASSERT_EQUAL(0u, labelsToIndices["label"]);
+        CPPUNIT_ASSERT(!result);
+        CPPUNIT_ASSERT(outputStream.str().find("Error") != string::npos);
     }
 
     // ============== loadIndexFromFile tests ==============
@@ -262,17 +263,17 @@ public:
     // ============== roundUpMaxIndex tests ==============
     
     void TestRoundUpMaxIndexMultipleOf32() {
-        // Values already multiple of 32 should stay same or round up
+        // roundUpMaxIndex rounds up to multiples of 128
         unsigned int result = roundUpMaxIndex(32);
         CPPUNIT_ASSERT(result >= 32);
-        CPPUNIT_ASSERT(result % 32 == 0);
+        CPPUNIT_ASSERT(result % 128 == 0);
     }
     
     void TestRoundUpMaxIndexNotMultipleOf32() {
         unsigned int result = roundUpMaxIndex(33);
         CPPUNIT_ASSERT(result >= 33);
-        CPPUNIT_ASSERT(result % 32 == 0);
-        CPPUNIT_ASSERT_EQUAL(64u, result);
+        CPPUNIT_ASSERT(result % 128 == 0);
+        CPPUNIT_ASSERT_EQUAL(128u, result);
     }
     
     void TestRoundUpMaxIndexZero() {
@@ -282,15 +283,15 @@ public:
     }
     
     void TestRoundUpMaxIndexSmallValues() {
-        CPPUNIT_ASSERT_EQUAL(32u, roundUpMaxIndex(1));
-        CPPUNIT_ASSERT_EQUAL(32u, roundUpMaxIndex(15));
-        CPPUNIT_ASSERT_EQUAL(32u, roundUpMaxIndex(31));
+        CPPUNIT_ASSERT_EQUAL(128u, roundUpMaxIndex(1));
+        CPPUNIT_ASSERT_EQUAL(128u, roundUpMaxIndex(15));
+        CPPUNIT_ASSERT_EQUAL(128u, roundUpMaxIndex(31));
     }
     
     void TestRoundUpMaxIndexLargeValues() {
         CPPUNIT_ASSERT_EQUAL(1024u, roundUpMaxIndex(1000));
         CPPUNIT_ASSERT_EQUAL(1024u, roundUpMaxIndex(1024));
-        CPPUNIT_ASSERT_EQUAL(1056u, roundUpMaxIndex(1025));
+        CPPUNIT_ASSERT_EQUAL(1152u, roundUpMaxIndex(1025));
     }
 
     // ============== parseSamples tests ==============
